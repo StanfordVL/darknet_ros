@@ -4,7 +4,7 @@
   <!-- Console launch prefix -->
     <!-- Console launch prefix -->
   <arg name="launch_prefix" default=""/>
-  <arg name="output"        default="screen"/>
+  <arg name="output"        default="log"/>
   <arg name="compressed"    default="false"/>
 
   <!-- Config and weights folder. -->
@@ -16,7 +16,7 @@
   <rosparam command="load" ns="darknet_ros" file="$(find darknet_ros)/config/yolov2_omni.yaml"/>
 
   <!-- Start darknet and ros wrapper -->
-  <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="$(arg output)" launch-prefix="$(arg launch_prefix)">
+  <node pkg="darknet_ros" type="darknet_ros" name="darknet_ros" output="$(arg output)" launch-prefix="$(arg launch_prefix)" respawn="true">
     <param name="weights_path"          value="$(arg yolo_weights_path)" />
     <param name="config_path"           value="$(arg yolo_config_path)" />
   </node>
