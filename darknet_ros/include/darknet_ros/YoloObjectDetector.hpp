@@ -20,6 +20,7 @@
 // ROS
 #include <ros/ros.h>
 #include <std_msgs/Header.h>
+#include <std_msgs/Time.h>
 #include <std_msgs/Int8.h>
 #include <actionlib/server/simple_action_server.h>
 #include <sensor_msgs/image_encodings.h>
@@ -206,6 +207,8 @@ class YoloObjectDetector
 
   int actionId_;
   boost::shared_mutex mutexActionStatus_;
+
+  ros::Time input_time_;
 
   // double getWallTime();
 
