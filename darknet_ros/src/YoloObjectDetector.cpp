@@ -419,7 +419,7 @@ void *YoloObjectDetector::fetchInThread()
 
 void *YoloObjectDetector::displayInThread(void *ptr)
 {
-  show_image_cv(buff_[(buffIndex_ + 1)%3], "YOLO V3", ipl_);
+  show_image_cv(buff_[(buffIndex_ + 1)%3], "YOLO", ipl_);
   int c = cvWaitKey(waitKeyDelay_);
   if (c != -1) c = c%256;
   if (c == 27) {
@@ -468,7 +468,7 @@ void YoloObjectDetector::setupNetwork(char *cfgfile, char *weightfile, char *dat
   demoThresh_ = thresh;
   demoHier_ = hier;
   fullScreen_ = fullscreen;
-  printf("YOLO V3\n");
+  printf("YOLO\n");
   net_ = load_network(cfgfile, weightfile, 0);
   set_batch_network(net_, 1);
 }
@@ -512,12 +512,12 @@ void YoloObjectDetector::yolo()
   int count = 0;
 
   if (!demoPrefix_ && viewImage_) {
-    cvNamedWindow("YOLO V3", CV_WINDOW_NORMAL);
+    cvNamedWindow("YOLO", CV_WINDOW_NORMAL);
     if (fullScreen_) {
-      cvSetWindowProperty("YOLO V3", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
+      cvSetWindowProperty("YOLO", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
     } else {
-      cvMoveWindow("YOLO V3", 0, 0);
-      cvResizeWindow("YOLO V3", 640, 480);
+      cvMoveWindow("YOLO", 0, 0);
+      cvResizeWindow("YOLO", frameWidth_, frameHeight_);
     }
   }
 
