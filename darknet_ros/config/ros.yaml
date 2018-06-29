@@ -1,7 +1,7 @@
 subscribers:
 
   camera_reading:
-    topic: /camera/rgb/image_raw
+    topic: /camera/rgb/image_rect_color
     queue_size: 1
 
 actions:
@@ -17,7 +17,7 @@ publishers:
     latch: false
 
   bounding_boxes:
-    topic: /darknet_ros/bounding_boxes
+    topic: /yolo_bboxes
     queue_size: 1
     latch: false
 
@@ -28,6 +28,6 @@ publishers:
 
 image_view:
 
-  enable_opencv: true
+  enable_opencv: false
   wait_key_delay: 1
-  enable_console_output: true
+  enable_console_output: false
