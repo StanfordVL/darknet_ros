@@ -177,8 +177,7 @@ void YoloObjectDetector::init()
   checkForObjectsActionServer_->registerPreemptCallback(
       boost::bind(&YoloObjectDetector::checkForObjectsActionPreemptCB, this));
   checkForObjectsActionServer_->start();
-
-  this->input_time_ = ros::Time::now();
+  input_time_ = ros::Time::now();
 }
 
 void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
@@ -190,7 +189,6 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
   try {
     cam_image = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     imageHeader_ = msg->header;
-    input_time_ = msg->header.stamp;
   } catch (cv_bridge::Exception& e) {
     ROS_ERROR("cv_bridge exception: %s", e.what());
     return;
@@ -205,6 +203,7 @@ void YoloObjectDetector::cameraCallback(const sensor_msgs::ImageConstPtr& msg)
       boost::unique_lock<boost::shared_mutex> lockImageStatus(mutexImageStatus_);
       imageStatus_ = true;
     }
+    input_time_ = msg->header.stamp;;
     frameWidth_ = cam_image->image.size().width;
     frameHeight_ = cam_image->image.size().height;
   }
@@ -264,7 +263,7 @@ bool YoloObjectDetector::publishDetectionImage(const cv::Mat& detectionImage)
   if (detectionImagePublisher_.getNumSubscribers() < 1)
     return false;
   cv_bridge::CvImage cvImage;
-  cvImage.header.stamp = this->input_time_;
+  cvImage.header.stamp = buffStamp_[buffIndex_];
   cvImage.header.frame_id = "detection_image";
   cvImage.encoding = sensor_msgs::image_encodings::BGR8;
   cvImage.image = detectionImage;
@@ -417,6 +416,7 @@ void *YoloObjectDetector::fetchInThread()
   }
   rgbgr_image(buff_[buffIndex_]);
   letterbox_image_into(buff_[buffIndex_], net_->w, net_->h, buffLetter_[buffIndex_]);
+  buffStamp_[buffIndex_] = input_time_;
   return 0;
 }
 
@@ -510,6 +510,9 @@ void YoloObjectDetector::yolo()
   buffLetter_[0] = letterbox_image(buff_[0], net_->w, net_->h);
   buffLetter_[1] = letterbox_image(buff_[0], net_->w, net_->h);
   buffLetter_[2] = letterbox_image(buff_[0], net_->w, net_->h);
+  buffStamp_[0] = ros::Time::now();
+  buffStamp_[1] = ros::Time::now();
+  buffStamp_[2] = ros::Time::now();
   ipl_ = cvCreateImage(cvSize(buff_[0].w, buff_[0].h), IPL_DEPTH_8U, buff_[0].c);
 
   int count = 0;
@@ -615,14 +618,14 @@ void *YoloObjectDetector::publishInThread()
         }
       }
     }
-    boundingBoxesResults_.header.stamp = this->input_time_;
+    boundingBoxesResults_.header.stamp = buffStamp_[buffIndex_];
     boundingBoxesResults_.header.frame_id = "detection";
     boundingBoxesResults_.image_header = imageHeader_;
     boundingBoxesPublisher_.publish(boundingBoxesResults_);
   } else {
     std_msgs::Int8 msg;
     msg.data = 0;
-    objectPublisher_.publish(msg);
+    objectPublisher_.publish(msg);;
   }
   if (isCheckingForObjects()) {
     ROS_DEBUG("[YoloObjectDetector] check for objects in image.");

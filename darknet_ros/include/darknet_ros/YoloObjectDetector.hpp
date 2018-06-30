@@ -170,6 +170,7 @@ class YoloObjectDetector
   image buff_[3];
   image buffLetter_[3];
   int buffId_[3];
+  ros::Time buffStamp_[3];
   int buffIndex_ = 0;
   IplImage * ipl_;
   float fps_ = 0;
