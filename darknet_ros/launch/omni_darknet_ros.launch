@@ -12,7 +12,7 @@
 
   <!-- Load parameters -->
   <rosparam command="load" ns="omni_darknet_ros" file="$(find darknet_ros)/config/ros_omni.yaml"/>
-  <rosparam command="load" ns="omni_darknet_ros" file="$(find darknet_ros)/config/yolov2_tiny_omni.yaml"/>
+  <rosparam command="load" ns="omni_darknet_ros" file="$(find darknet_ros)/config/yolov2_omni.yaml"/>
 
   <!-- Start darknet and ros wrapper -->
   <node pkg="darknet_ros" type="darknet_ros" name="omni_darknet_ros" output="$(arg output)" launch-prefix="$(arg launch_prefix)" respawn="true">
