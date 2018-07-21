@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(darknet_ros)
 
+# Set to 1 to use cudnn
+set(CUDNN 1)
+
 # Set c++11 cmake flags
 set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
 
@@ -29,6 +32,9 @@ if (CUDA_FOUND)
     -gencode arch=compute_62,code=sm_62
   )
   add_definitions(-DGPU)
+  if (CUDNN)
+    add_definitions(-DCUDNN)
+  endif()
 else()
   list(APPEND LIBRARIES "m")
 endif()
@@ -89,9 +95,20 @@ include_directories(
 
 if (CUDA_FOUND)
 
-  link_directories(
-    /usr/local/cuda/lib64
+  include_directories(
+    /usr/local/cuda 
+    /usr/local/cuda/include
   )
+  if (CUDNN)
+    link_directories(
+      /usr/local/cuda/lib64
+      /usr/local/cuda/lib64/libcudnn.so
+    )
+  else()
+    link_directories(
+      /usr/local/cuda/lib64
+    )
+  endif()
 
   cuda_add_library(${PROJECT_NAME}_lib
     src/YoloObjectDetector.cpp
@@ -137,19 +154,36 @@ if (CUDA_FOUND)
     ${DARKNET_PATH}/src/convolutional_kernels.cu  ${DARKNET_PATH}/src/maxpool_layer_kernels.cu
   )
 
-  target_link_libraries(${PROJECT_NAME}_lib
-    m
-    pthread
-    stdc++
-    cuda
-    cudart
-    cublas
-    curand
-    ${Boost_LIBRARIES}
-    ${OpenCV_LIBRARIES}
-    ${catkin_LIBRARIES}
-    ${OpenCV_LIBS}
-  )
+  if (CUDNN)
+    target_link_libraries(${PROJECT_NAME}_lib
+      m
+      pthread
+      stdc++
+      cuda
+      cudart
+      cublas
+      curand
+      cudnn
+      ${Boost_LIBRARIES}
+      ${OpenCV_LIBRARIES}
+      ${catkin_LIBRARIES}
+      ${OpenCV_LIBS}
+    )
+  else()
+    target_link_libraries(${PROJECT_NAME}_lib
+      m
+      pthread
+      stdc++
+      cuda
+      cudart
+      cublas
+      curand
+      ${Boost_LIBRARIES}
+      ${OpenCV_LIBRARIES}
+      ${catkin_LIBRARIES}
+      ${OpenCV_LIBS}
+    )
+  endif()
 
   cuda_add_executable(${PROJECT_NAME}
     src/yolo_object_detector_node.cpp
