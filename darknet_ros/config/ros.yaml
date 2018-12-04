@@ -1,7 +1,7 @@
 subscribers:
 
   camera_reading:
-    topic: /camera/rgb/image_rect_color
+    topic: /hsrb/head_rgbd_sensor/rgb/image_rect_color
     queue_size: 1
 
 actions:
@@ -28,6 +28,6 @@ publishers:
 
 image_view:
 
-  enable_opencv: false
+  enable_opencv: true
   wait_key_delay: 1
   enable_console_output: false
