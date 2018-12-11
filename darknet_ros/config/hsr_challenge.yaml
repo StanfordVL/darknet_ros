@@ -1,0 +1,16 @@
+yolo_model:
+
+  config_file:
+    name: hsr_challenge.cfg
+  weight_file:
+    name: hsr_challenge.weights
+  threshold:
+    value: 0.3
+  detection_classes:
+    names:
+      - blue_block
+      - red_block
+      - yellow_block
+      - tongs
+      - dollar_bill
+      - paper_towel   
